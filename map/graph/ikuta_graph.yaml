@@ -218,11 +218,11 @@ NODE:
     y: -7.43
   label: ''
 - id: 5
-  type: intersection
+  type: landmark
   point:
     x: -0.075
     y: -6.979
-  label: ''
+  label: 'laboratory'
 - id: 6
   type: intersection
   point:
@@ -320,11 +320,11 @@ NODE:
     y: -136.532
   label: ''
 - id: 22
-  type: intersection
+  type: landmark
   point:
     x: -111.811
     y: -142.719
-  label: ''
+  label: 'convenience store'
 - id: 23
   type: intersection
   point:

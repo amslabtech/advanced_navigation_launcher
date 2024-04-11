@@ -3,19 +3,15 @@
     <arg name="start" default="0" />
     <include file="$(find rwrc23)/launch/common/default_full.launch">
         <!-- course -->
-        <arg name="checkpoint" value="$(find rwrc23)/map/checkpoint/ikuta_new_course_checkpoint.yaml"/>
-        <!-- <arg name="checkpoint" value="$(find rwrc23)/map/checkpoint/ikuta_circuit3_checkpoint.yaml"/> -->
-        <!-- <arg name="checkpoint" value="$(find rwrc23)/map/checkpoint/ikuta_full_checkpoint.yaml"/> -->
-        <!-- <arg name="checkpoint" value="$(find rwrc23)/map/checkpoint/ikuta_mini_checkpoint.yaml"/> -->
-        <arg name="task_list" value="$(find rwrc23)/map/task/ikuta_new_course_task.yaml"/>
+        <!-- <arg name="task_list" value="$(find rwrc23)/map/task/ikuta_new_course_task.yaml"/> -->
         <!-- <arg name="task_list" value="$(find rwrc23)/map/task/ikuta_task.yaml"/> -->
-        <!-- <arg name="task_list" value="$(find rwrc23)/map/task/no_task.yaml"/> -->
+        <arg name="task_list" value="$(find rwrc23)/map/task/no_task.yaml"/>
 
         <!-- common -->
         <arg name="start_node_id" value="$(arg start)"/>
-        <arg name="stop_list" value="$(find rwrc23)/map/stop/ikuta_new_course_stop.yaml"/>
+        <!-- <arg name="stop_list" value="$(find rwrc23)/map/stop/ikuta_new_course_stop.yaml"/> -->
         <!-- <arg name="stop_list" value="$(find rwrc23)/map/stop/ikuta_stop.yaml"/> -->
-        <!-- <arg name="stop_list" value="$(find rwrc23)/map/stop/no_stop.yaml"/> -->
+        <arg name="stop_list" value="$(find rwrc23)/map/stop/no_stop.yaml"/>
         <arg name="use_stop_line_detector" value="true"/>
         <arg name="stop_line_param" default="$(find rwrc23)/config/param/stop_line_detector/ikuta_outdoor.yaml"/>
         <arg name="local_goal_dist" value="4.0"/>

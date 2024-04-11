@@ -12,7 +12,6 @@
     <arg name="enable_announce" default="false"/>
     <arg name="sound_volume" default="0"/>
     <arg name="map_file" default=""/>
-    <arg name="checkpoint_file" default=""/>
     <arg name="dwa_target_velocity" default="1.0"/>
     <arg name="pfp_target_velocity" default="1.0"/>
     <arg name="detect_line_pfp_target_velocity" default="1.0"/>
@@ -36,10 +35,12 @@
     <arg name="select_topic" default="/local_planner/finish_flag/selected"/>
 
     <!-- ###### Launch node ###### -->
+    <node pkg="amsl_navigation_managers" type="global_path_planner.py" name="global_path_planner" output="screen">
+        <param name="start_node_id" value="$(arg start_node_id)"/>
+    </node>
     <node pkg="amsl_navigation_managers" type="rwrc23_task_manager.py" name="task_manager" output="screen">
         <param name="TASK_LIST_PATH" value="$(arg task_list_path)"/>
         <param name="STOP_LIST_PATH" value="$(arg stop_list_path)"/>
-        <param name="CHECKPOINT_PATH" value="$(arg checkpoint_file)" />
         <param name="USE_DETECT_WHITE_LINE" value="$(arg use_stop_line_detector)"/>
         <param name="STOP_LINE_THRESHOLD" value="5"/>
         <param name="ANNOUNCE_SOUND_PATH" value="$(arg announce_sound_path)"/>
@@ -75,7 +76,6 @@
         <param name="HZ" value="10" />
     </node>
     <node pkg="amsl_navigation_managers" type="checkpoint_manager.py" name="checkpoint_manager" ns="navigation_managers">
-        <param name="CHECKPOINT_PATH" value="$(arg checkpoint_file)" />
         <param name="HZ" value="10" />
     </node>
 </launch>
