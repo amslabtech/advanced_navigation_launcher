@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="start_node_id" default="0"/>
+    <arg name="task_list_path" default="/home/amsl/catkin_ws/src/rwrc23/map/task/ikuta_test_task.yaml"/>
+    <arg name="stop_list_path" default="/home/amsl/catkin_ws/src/rwrc23/map/stop/ikuta_test_stop.yaml" />
+
+    <!-- common -->
+    <arg name="localized_pose_topic" default="/localized_pose"/>
+    <arg name="checkpoint_topic" default="/node_edge_map/checkpoint"/>
+    <arg name="use_stop_line_detector" default="True"/>
+    <arg name="announce_sound_path" default="$(find amsl_navigation_managers)/sounds/announcement_long.wav"/>
+    <arg name="enable_announce" default="false"/>
+    <arg name="sound_volume" default="0"/>
+    <arg name="map_file" default=""/>
+    <arg name="checkpoint_file" default=""/>
+    <arg name="dwa_target_velocity" default="1.0"/>
+    <arg name="pfp_target_velocity" default="1.0"/>
+    <arg name="detect_line_pfp_target_velocity" default="1.0"/>
+    <arg name="slow_target_velocity" default="1.0"/>
+    <arg name="sleep_time_after_finish" default="0.5"/>
+    <arg name="cmd_vel_topic" default="/local_planner/cmd_vel"/>
+    <arg name="cand_traj_topic" default="/local_planner/candidate_trajectories"/>
+    <arg name="sel_traj_topic" default="/local_planner/selected_trajectory"/>
+    <arg name="footprint_topic" default="/local_planner/predict_footprints"/>
+    <arg name="finish_flag_topic" default="/local_planner/finish_flag"/>
+    <arg name="dwa_cmd_vel" default="/local_planner/dwa_planner/cmd_vel"/>
+    <arg name="dwa_cand_traj" default="/local_planner/dwa_planner/candidate_trajectories"/>
+    <arg name="dwa_sel_traj" default="/local_planner/dwa_planner/selected_trajectory"/>
+    <arg name="dwa_footprint" default="/local_planner/dwa_planner/predict_footprints"/>
+    <arg name="dwa_finish_flag" default="/local_planner/dwa_planner/finish_flag"/>
+    <arg name="pfp_cmd_vel" default="/local_planner/point_follow_planner/cmd_vel"/>
+    <arg name="pfp_cand_traj" default="/local_planner/point_follow_planner/candidate_trajectories"/>
+    <arg name="pfp_best_traj" default="/local_planner/point_follow_planner/best_trajectory"/>
+    <arg name="pfp_footprint" default="/local_planner/point_follow_planner/predict_footprints"/>
+    <arg name="pfp_finish_flag" default="/local_planner/point_follow_planner/finish_flag"/>
+    <arg name="select_topic" default="/local_planner/finish_flag/selected"/>
+
+    <!-- ###### Launch node ###### -->
+    <node pkg="amsl_navigation_managers" type="rwrc23_task_manager.py" name="task_manager" output="screen">
+        <param name="TASK_LIST_PATH" value="$(arg task_list_path)"/>
+        <param name="STOP_LIST_PATH" value="$(arg stop_list_path)"/>
+        <param name="CHECKPOINT_PATH" value="$(arg checkpoint_file)" />
+        <param name="USE_DETECT_WHITE_LINE" value="$(arg use_stop_line_detector)"/>
+        <param name="STOP_LINE_THRESHOLD" value="5"/>
+        <param name="ANNOUNCE_SOUND_PATH" value="$(arg announce_sound_path)"/>
+        <param name="start_node_id" value="$(arg start_node_id)"/>
+        <param name="enable_announce" value="$(arg enable_announce)"/>
+        <param name="sound_volume" value="$(arg sound_volume)"/>
+        <param name="dwa_target_velocity" value="$(arg dwa_target_velocity)"/>
+        <param name="pfp_target_velocity" value="$(arg pfp_target_velocity)"/>
+        <param name="detect_line_pfp_target_velocity" value="$(arg detect_line_pfp_target_velocity)"/>
+        <param name="slow_target_velocity" value="$(arg slow_target_velocity)"/>
+        <param name="sleep_time_after_finish" value="$(arg sleep_time_after_finish)"/>
+        <param name="cmd_vel_topic" value="$(arg cmd_vel_topic)"/>
+        <param name="cand_traj_topic" value="$(arg cand_traj_topic)"/>
+        <param name="sel_traj_topic" value="$(arg sel_traj_topic)"/>
+        <param name="footprint_topic" value="$(arg footprint_topic)"/>
+        <param name="finish_flag_topic" value="$(arg finish_flag_topic)"/>
+        <param name="dwa_cmd_vel" value="$(arg dwa_cmd_vel)"/>
+        <param name="dwa_cand_traj" value="$(arg dwa_cand_traj)"/>
+        <param name="dwa_sel_traj" value="$(arg dwa_sel_traj)"/>
+        <param name="dwa_footprint" value="$(arg dwa_footprint)"/>
+        <param name="dwa_finish_flag" value="$(arg dwa_finish_flag)"/>
+        <param name="pfp_cmd_vel" value="$(arg pfp_cmd_vel)"/>
+        <param name="pfp_cand_traj" value="$(arg pfp_cand_traj)"/>
+        <param name="pfp_best_traj" value="$(arg pfp_best_traj)"/>
+        <param name="pfp_footprint" value="$(arg pfp_footprint)"/>
+        <param name="pfp_finish_flag" value="$(arg pfp_finish_flag)"/>
+        <remap from="/amcl_pose" to="$(arg localized_pose_topic)"/>
+        <remap from="/checkpoint" to="$(arg checkpoint_topic)"/>
+        <remap from="/select_topic" to="$(arg select_topic)"/>
+    </node>
+    <node pkg="amsl_navigation_managers" type="node_edge_map_manager.py" name="node_edge_map_manager" ns="navigation_managers">
+        <param name="MAP_PATH" value="$(arg map_file)" />
+        <param name="HZ" value="10" />
+    </node>
+    <node pkg="amsl_navigation_managers" type="checkpoint_manager.py" name="checkpoint_manager" ns="navigation_managers">
+        <param name="CHECKPOINT_PATH" value="$(arg checkpoint_file)" />
+        <param name="HZ" value="10" />
+    </node>
+</launch>

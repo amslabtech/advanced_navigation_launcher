@@ -1,0 +1,8 @@
+stop_list:
+    - node_id: 19
+    - node_id: 23
+    - node_id: 101
+    - node_id: 200
+    - node_id: 103
+    - node_id: 61
+    - node_id: 0

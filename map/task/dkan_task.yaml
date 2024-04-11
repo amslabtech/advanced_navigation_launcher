@@ -1,0 +1,13 @@
+task:
+  - task_type: "detect_line"
+    edge:
+      node0_id: 1
+      node1_id: 2
+  - task_type: "slow"
+    edge:
+      node0_id: 4
+      node1_id: 5
+  - task_type: "slow"
+    edge:
+      node0_id: 5
+      node1_id: 6

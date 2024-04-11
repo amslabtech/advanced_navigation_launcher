@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="bagfile" default="/share/share/RWRC/rwrc23/bagfiles/tsukuba_23-10-21/rwrc23_main_2023-10-21-12-07-59.bag"/>
+    <arg name="map_pcd" default="/share/share/RWRC/rwrc23/pcd/tsukuba.pcd"/>
+    <!-- <arg name="map_pcd" default="/share/PCD/ikuta/ikuta_outdoor.pcd"/> -->
+    <arg name="node_edge_map_file" default="/home/amsl/catkin_ws/src/rwrc23/map/graph/tsukuba_graph.yaml"/>
+    <arg name="checkpoint_file" default="/home/amsl/catkin_ws/src/rwrc23/map/checkpoint/tsukuba_checkpoints.yaml"/>
+    <arg name="start_node" default="56"/>
+    <arg name="bag_start" default="250"/>
+    <arg name="bag_rate" default="1"/>
+    <arg name="rviz" default="/home/amsl/catkin_ws/src/rwrc23/config/rviz/localgoal.rviz"/>
+
+    <include file="$(find localgoal_creator)/launch/localgoal_creator.launch">
+        <arg name="start_node" value="$(arg start_node)"/>
+        <arg name="checkpoint_topic" value="/node_edge_map/checkpoint"/>
+        <arg name="node_edge_map_topic" value="/node_edge_map/map"/>
+        <arg name="pose_topic" value="/localized_pose"/>
+    </include>
+
+    <include file="$(find rwrc23)/launch/test/play_bag_for_ndt.launch">
+        <arg name="bagfile" value="$(arg bagfile)"/>
+        <arg name="map_pcd" value="$(arg map_pcd)"/>
+        <arg name="rviz_conf" value="$(arg rviz)"/>
+        <arg name="start" value="$(arg bag_start)"/>
+        <arg name="rate" value="$(arg bag_rate)"/>
+    </include>
+
+    <node pkg="amsl_navigation_managers" type="node_edge_map_manager.py" name="node_edge_map_manager" ns="navigation_managers">
+        <param name="MAP_PATH" value="$(arg node_edge_map_file)" />
+        <param name="HZ" value="10" />
+    </node>
+    <node pkg="amsl_navigation_managers" type="checkpoint_manager.py" name="checkpoint_manager" ns="navigation_managers">
+        <param name="CHECKPOINT_PATH" value="$(arg checkpoint_file)" />
+        <param name="HZ" value="10" />
+    </node>
+    <node pkg="amsl_navigation_utils" type="initialpose_publisher" name="initialpose_publisher">
+        <param name="init_node" value="$(arg start_node)"/>
+        <remap from="map_cloud" to="map_cloud/downsampled"/>
+        <remap from="checkpoint" to="node_edge_map/checkpoint"/>
+        <remap from="node_edge_map" to="node_edge_map/map"/>
+    </node>
+    <node pkg="amsl_navigation_utils" type="initialpose_adjuster" name="initialpose_adjuster">
+        <param name="reference_range" value="50.0"/>
+        <remap from="map_cloud" to="map_cloud/downsampled"/>
+    </node>
+</launch>

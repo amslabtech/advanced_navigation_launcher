@@ -1,0 +1,245 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="map_pcd" default="/home/amsl/pcd/"/>
+    <arg name="node_edge_map" default="$(find rwrc23)/map/graph"/>
+    <arg name="checkpoint" default="$(find rwrc23)/map/checkpoint"/>
+    <arg name="start_node_id" default="0"/>
+    <arg name="task_list" default="$(find rwrc23)/map/task"/>
+    <arg name="stop_list" default="$(find rwrc23)/map/stop"/>
+    <arg name="local_goal_dist" default="4.0"/>
+    <arg name="local_map_expansion" default="0.2"/> <!-- m -->
+    <arg name="local_map_topic" default="/local_map/expand"/>
+    <!-- Localizer method -->
+    <arg name="localizer_3d/use_static_clouds" default="true"/>
+    <arg name="localizer_3d/scan_cloud_topic" default="/cloud/static" if="$(arg localizer_3d/use_static_clouds)"/>
+    <arg name="localizer_3d/scan_cloud_topic" default="/velodyne_points" unless="$(arg localizer_3d/use_static_clouds)"/>
+    <arg name="localizer_3d/localization_method" default=""/> <!-- ndt or mcl_with_imu or mcl_no_imu-->
+    <arg name="localized_pose_topic" default="/localized_pose"/>
+    <arg name="ndt_scan_range" default="100"/>
+    <arg name="ndt_sigma_odom" default="0.01"/>
+    <arg name="ndt_sigma_imu" default="0.01"/>
+    <arg name="ndt_sigma_scan" default="0.1"/>
+    <!-- Planner -->
+    <arg name="planner_hz" default="20"/>
+    <arg name="sleep_time_after_finish" default="0.5"/>
+    <arg name="dwa_robot_param" default="$(find rwrc23)/config/param/dwa/robot_param.yaml"/>
+    <arg name="dwa_param" default="$(find rwrc23)/config/param/dwa/dwa_param.yaml"/>
+    <arg name="pfp_robot_param" default="$(find rwrc23)/config/param/pfp/robot_param.yaml"/>
+    <arg name="pfp_param" default="$(find rwrc23)/config/param/pfp/planner_param.yaml"/>
+    <!-- stop_line_detector -->
+    <arg name="use_stop_line_detector" default="true"/>
+    <arg name="stop_line_param" default="$(find rwrc23)/config/param/stop_line_detector/stop_line_detector.yaml"/>
+    <!-- map downsampling -->
+    <arg name="use_downsampled_map" default="true"/>
+    <arg name="leaf_size" default="0.32"/>
+    <!-- initialpose -->
+    <arg name="use_initialpose_adjuster" default="true"/>
+    <arg name="initialpose_topic" default="initialpose" unless="$(arg use_initialpose_adjuster)"/>
+    <arg name="initialpose_topic" default="initialpose/adjusted" if="$(arg use_initialpose_adjuster)"/>
+    <!-- target_velocity -->
+    <arg name="dwa_target_velocity" default="1.0"/>
+    <arg name="pfp_target_velocity" default="1.0"/>
+    <arg name="detect_line_pfp_target_velocity" default="0.2"/>
+    <arg name="slow_target_velocity" default="0.6"/>
+    <!-- mux topic name -->
+    <arg name="cmd_vel_topic" default="/local_planner/cmd_vel"/>
+    <arg name="cand_traj_topic" default="/local_planner/candidate_trajectories"/>
+    <arg name="sel_traj_topic" default="/local_planner/selected_trajectory"/>
+    <arg name="footprint_topic" default="/local_planner/predict_footprints"/>
+    <arg name="finish_flag_topic" default="/local_planner/finish_flag"/>
+    <arg name="dwa_cmd_vel" default="/local_planner/dwa_planner/cmd_vel"/>
+    <arg name="dwa_cand_traj" default="/local_planner/dwa_planner/candidate_trajectories"/>
+    <arg name="dwa_sel_traj" default="/local_planner/dwa_planner/selected_trajectory"/>
+    <arg name="dwa_footprint" default="/local_planner/dwa_planner/predict_footprints"/>
+    <arg name="dwa_finish_flag" default="/local_planner/dwa_planner/finish_flag"/>
+    <arg name="pfp_cmd_vel" default="/local_planner/point_follow_planner/cmd_vel"/>
+    <arg name="pfp_cand_traj" default="/local_planner/point_follow_planner/candidate_trajectories"/>
+    <arg name="pfp_best_traj" default="/local_planner/point_follow_planner/best_trajectory"/>
+    <arg name="pfp_footprint" default="/local_planner/point_follow_planner/predict_footprints"/>
+    <arg name="pfp_finish_flag" default="/local_planner/point_follow_planner/finish_flag"/>
+    <arg name="select_topic" default="/local_planner/finish_flag/selected"/>
+    <!-- rviz -->
+    <arg name="rviz_conf" default="$(find rwrc23)/config/rviz/rviz.rviz"/>
+
+
+    <!-- ########## Map load ########## -->
+    <node pkg="pcl_ros" type="pcd_to_pointcloud" name="pcd_to_pointcloud" args="$(arg map_pcd)" output="screen">
+        <param name="frame_id" value="map"/>
+        <param name="latch" value="true"/>
+        <remap from="/cloud_pcd" to="/map_cloud"/>
+    </node>
+    <node pkg="amsl_navigation_utils" type="map_cloud_downsampler" name="map_cloud_downsampler" output="screen" respawn="true" if="$(arg use_downsampled_map)">
+        <param name="leaf_size" value="$(arg leaf_size)"/>
+    </node>
+
+
+    <!-- ########## Launch Localizer ########## -->
+    <!-- initialize pose -->
+    <node pkg="amsl_navigation_utils" type="initialpose_publisher" name="initialpose_publisher">
+        <param name="init_node" value="$(arg start_node_id)"/>
+        <remap from="map_cloud" to="map_cloud/downsampled" if="$(arg use_downsampled_map)"/>
+        <remap from="map_cloud" to="map_cloud" unless="$(arg use_downsampled_map)"/>
+        <remap from="checkpoint" to="node_edge_map/checkpoint"/>
+        <remap from="node_edge_map" to="node_edge_map/map"/>
+    </node>
+    <node pkg="amsl_navigation_utils" type="initialpose_adjuster" name="initialpose_adjuster" if="$(arg use_initialpose_adjuster)">
+        <param name="reference_range" value="50.0"/>
+        <remap from="map_cloud" to="map_cloud/downsampled" if="$(arg use_downsampled_map)"/>
+        <remap from="map_cloud" to="map_cloud" unless="$(arg use_downsampled_map)"/>
+    </node>
+    <!-- odometry filter -->
+    <node pkg="complement" type="complement" name="complement"/>
+    <!-- Use static clouds -->
+    <group if="$(arg localizer_3d/use_static_clouds)">
+        <include file="$(find velodyne_height_map)/launch/amsl_velodyne_heightmap.launch"/>
+        <include file="$(find dynamic_cloud_detector)/launch/dynamic_cloud_detector.launch">
+            <arg name="input_cloud" value="/velodyne_obstacles"/>
+        </include>
+    </group>
+    <!-- mcl_with_imu -->
+    <group if="$(eval arg('localizer_3d/localization_method')=='mcl_with_imu')">
+        <include file="$(find rwrc23)/launch/common/mcl_3dl.launch">
+            <arg name="without_imu" value="false"/>
+            <arg name="pose_topic_name" value="$(arg localized_pose_topic)"/>
+            <arg name="scan_cloud" value="$(arg localizer_3d/scan_cloud_topic)"/>
+            <arg name="map_cloud" value="/map_cloud/downsampled" if="$(arg use_downsampled_map)"/>
+            <arg name="map_cloud" value="/map_cloud" unless="$(arg use_downsampled_map)"/>
+            <arg name="initialpose_topic" value="$(arg initialpose_topic)"/>
+        </include>
+    </group>
+    <!-- mcl_no_imu -->
+    <group if="$(eval arg('localizer_3d/localization_method')=='mcl_no_imu')">
+        <include file="$(find rwrc23)/launch/common/mcl_3dl.launch">
+            <arg name="without_imu" value="true"/>
+            <arg name="pose_topic_name" value="$(arg localized_pose_topic)"/>
+            <arg name="scan_cloud" value="$(arg localizer_3d/scan_cloud_topic)"/>
+            <arg name="map_cloud" value="/map_cloud/downsampled" if="$(arg use_downsampled_map)"/>
+            <arg name="map_cloud" value="/map_cloud" unless="$(arg use_downsampled_map)"/>
+            <arg name="initialpose_topic" value="$(arg initialpose_topic)"/>
+        </include>
+    </group>
+    <!-- ndt -->
+    <group if="$(eval arg('localizer_3d/localization_method')=='ndt')">
+        <include file="$(find rwrc23)/launch/common/ndt.launch">
+            <arg name="scan_cloud" value="$(arg localizer_3d/scan_cloud_topic)"/>
+            <arg name="map_cloud" value="/map_cloud/downsampled" if="$(arg use_downsampled_map)"/>
+            <arg name="map_cloud" value="/map_cloud" unless="$(arg use_downsampled_map)"/>
+            <arg name="leaf_size" value="$(arg leaf_size)"/>
+            <arg name="scan_range" value="$(arg ndt_scan_range)"/>
+            <param name="sigma_odom" value="$(arg ndt_sigma_odom)"/>
+            <param name="sigma_imu" value="$(arg ndt_sigma_imu)"/>
+            <param name="sigma_ndt" value="$(arg ndt_sigma_scan)"/>
+            <arg name="initialpose_topic" value="$(arg initialpose_topic)"/>
+        </include>
+        <node pkg="amsl_navigation_utils" type="odom_to_pose" name="odom_to_pose">
+            <remap from="/odom" to="/estimated_pose"/>
+            <remap from="/pose" to="$(arg localized_pose_topic)"/>
+        </node>
+    </group>
+
+
+    <!-- ########## Launch Planner ########## -->
+    <!-- footprint publisher -->
+    <node pkg="amsl_navigation_utils" type="footprint_publisher" name="footprint_publisher">
+        <param name="hz" value="1"/>
+        <rosparam command="load" file="$(find rwrc23)/config/param/footprint/robot_param.yaml"/>
+    </node>
+    <!-- dwa -->
+    <include file="$(find rwrc23)/launch/common/dwa.launch">
+        <arg name="hz" value="$(arg planner_hz)"/>
+        <arg name="cmd_vel" value="$(arg dwa_cmd_vel)"/>
+        <arg name="sleep_time_after_finish" value="$(arg sleep_time_after_finish)"/>
+        <arg name="local_map" value="$(arg local_map_topic)"/>
+        <arg name="robot_param" value="$(arg dwa_robot_param)"/>
+        <arg name="dwa_param" value="$(arg dwa_param)"/>
+        <arg name="path" value="/local_goal_creator/path"/>
+        <remap from="selected_trajectory" to="$(arg dwa_sel_traj)"/>
+        <remap from="candidate_trajectories" to="$(arg dwa_cand_traj)"/>
+    </include>
+    <!-- point follow planner -->
+    <include file="$(find rwrc23)/launch/common/pfp.launch">
+        <arg name="hz" value="$(arg planner_hz)"/>
+        <arg name="cmd_vel" value="$(arg pfp_cmd_vel)"/>
+        <arg name="sleep_time_after_finish" value="$(arg sleep_time_after_finish)"/>
+        <arg name="local_map" value="$(arg local_map_topic)"/>
+        <arg name="robot_param" value="$(arg pfp_robot_param)"/>
+        <arg name="planner_param" value="$(arg pfp_param)"/>
+        <remap from="best_trajectory" to="$(arg pfp_best_traj)"/>
+        <remap from="candidate_trajectories" to="$(arg pfp_cand_traj)"/>
+    </include>
+
+
+    <!-- ########## Others ########## -->
+    <!-- localgoal_creator -->
+    <include file="$(find localgoal_creator)/launch/localgoal_creator.launch">
+        <arg name="hz" value="$(arg planner_hz)"/>
+        <arg name="start_node" value="$(arg start_node_id)"/>
+        <arg name="local_goal_interval" value="0.2"/>
+        <arg name="local_goal_dist" value="$(arg local_goal_dist)"/>
+        <arg name="limit_for_skip" value="90.0"/>
+        <arg name="checkpoint_topic" value="/node_edge_map/checkpoint"/>
+        <arg name="node_edge_map_topic" value="/node_edge_map/map"/>
+        <arg name="pose_topic" value="$(arg localized_pose_topic)"/>
+        <arg name="reached_checkpoint_flag_topic" value="/finish_flag"/>
+    </include>
+
+    <!-- localmap creator -->
+    <include file="$(find rwrc23)/launch/common/localmap_creator.launch">
+        <arg name="local_map_expansion" value="$(arg local_map_expansion)"/>
+    </include>
+
+    <!-- stop line detector -->
+    <include file="$(find rwrc23_stop_line_detector)/launch/stop_line_detector.launch" if="$(arg use_stop_line_detector)">
+        <arg name="config_file" value="$(arg stop_line_param)"/>
+        <arg name="image_topic" default="/realsense/color/image_raw/compressed"/>
+        <arg name="boot_flag_topic" default="/task_manager/request_detect_line"/>
+        <arg name="hz" default="10"/>
+        <arg name="num_detection" default="3"/>
+        <arg name="visualize" default="true"/>
+    </include>
+
+    <!-- traffic light detector -->
+    <include file="$(find traffic_light_detector)/launch/docker_run.launch"/>
+
+    <!-- amsl_navigation_managers -->
+    <include file="$(find rwrc23)/launch/common/amsl_navigation_managers.launch">
+        <arg name="start_node_id" value="$(arg start_node_id)"/>
+        <arg name="map_file" value="$(arg node_edge_map)"/>
+        <arg name="checkpoint_file" value="$(arg checkpoint)"/>
+        <arg name="task_list_path" value="$(arg task_list)"/>
+        <arg name="stop_list_path" value="$(arg stop_list)"/>
+        <arg name="localized_pose_topic" value="$(arg localized_pose_topic)"/>
+        <arg name="use_stop_line_detector" value="$(arg use_stop_line_detector)"/>
+        <arg name="dwa_target_velocity" value="$(arg dwa_target_velocity)"/>
+        <arg name="pfp_target_velocity" value="$(arg pfp_target_velocity)"/>
+        <arg name="detect_line_pfp_target_velocity" value="$(arg detect_line_pfp_target_velocity)"/>
+        <arg name="slow_target_velocity" value="$(arg slow_target_velocity)"/>
+        <arg name="sleep_time_after_finish" value="$(arg sleep_time_after_finish)"/>
+        <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)"/>
+        <arg name="cand_traj_topic" value="$(arg cand_traj_topic)"/>
+        <arg name="sel_traj_topic" value="$(arg sel_traj_topic)"/>
+        <arg name="footprint_topic" value="$(arg footprint_topic)"/>
+        <arg name="finish_flag_topic" value="$(arg finish_flag_topic)"/>
+        <arg name="dwa_cmd_vel" value="$(arg dwa_cmd_vel)"/>
+        <arg name="dwa_cand_traj" value="$(arg dwa_cand_traj)"/>
+        <arg name="dwa_sel_traj" value="$(arg dwa_sel_traj)"/>
+        <arg name="dwa_footprint" value="$(arg dwa_footprint)"/>
+        <arg name="dwa_finish_flag" value="$(arg dwa_finish_flag)"/>
+        <arg name="pfp_cmd_vel" value="$(arg pfp_cmd_vel)"/>
+        <arg name="pfp_cand_traj" value="$(arg pfp_cand_traj)"/>
+        <arg name="pfp_best_traj" value="$(arg pfp_best_traj)"/>
+        <arg name="pfp_footprint" value="$(arg pfp_footprint)"/>
+        <arg name="pfp_finish_flag" value="$(arg pfp_finish_flag)"/>
+        <arg name="select_topic" value="$(arg select_topic)"/>
+    </include>
+
+    <!-- mux -->
+    <node pkg="topic_tools" type="mux" name="" args="/local_path/cmd_vel $(arg dwa_cmd_vel) $(arg pfp_cmd_vel) mux:=$(arg cmd_vel_topic)"/>
+    <node pkg="topic_tools" type="mux" name="" args="$(arg cand_traj_topic) $(arg dwa_cand_traj) $(arg pfp_cand_traj) mux:=$(arg cand_traj_topic)"/>
+    <node pkg="topic_tools" type="mux" name="" args="$(arg sel_traj_topic) $(arg dwa_sel_traj) $(arg pfp_best_traj) mux:=$(arg sel_traj_topic)"/>
+    <node pkg="topic_tools" type="mux" name="" args="$(arg footprint_topic) $(arg dwa_footprint) $(arg pfp_footprint) mux:=$(arg footprint_topic)"/>
+    <node pkg="topic_tools" type="mux" name="" args="$(arg finish_flag_topic) $(arg dwa_finish_flag) $(arg pfp_finish_flag) mux:=$(arg finish_flag_topic)"/>
+
+    <!-- rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_conf)"/>
+</launch>

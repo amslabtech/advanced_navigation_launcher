@@ -1,0 +1,117 @@
+task:
+    - task_type: "in_line"
+      edge:
+          node0_id: 2
+          node1_id: 3
+    - task_type: "in_line"
+      edge:
+          node0_id: 3
+          node1_id: 5
+    # - task_type: "in_line"
+    #   edge:
+    #       node0_id: 3
+    #       node1_id: 4
+    # - task_type: "in_line"
+    #   edge:
+    #       node0_id: 4
+    #       node1_id: 5
+    - task_type: "slow"
+      edge:
+          node0_id: 8
+          node1_id: 9
+    - task_type: "in_line"
+      edge:
+          node0_id: 9
+          node1_id: 10
+    - task_type: "slow"
+      edge:
+          node0_id: 11
+          node1_id: 12
+    - task_type: "in_line"
+      edge:
+          node0_id: 15
+          node1_id: 16
+    - task_type: "in_line"
+      edge:
+          node0_id: 16
+          node1_id: 17
+    - task_type: "in_line"
+      edge:
+          node0_id: 221
+          node1_id: 21
+    - task_type: "in_line"
+      edge:
+          node0_id: 2324
+          node1_id: 24
+    - task_type: "in_line"
+      edge:
+          node0_id: 2425
+          node1_id: 25
+    - task_type: "in_line"
+      edge:
+          node0_id: 27
+          node1_id: 28
+    - task_type: "in_line"
+      edge:
+          node0_id: 2728
+          node1_id: 28
+    - task_type: "in_line"
+      edge:
+          node0_id: 28
+          node1_id: 29
+    - task_type: "in_line"
+      edge:
+          node0_id: 29
+          node1_id: 30
+    - task_type: "in_line"
+      edge:
+          node0_id: 28
+          node1_id: 30
+    - task_type: "detect_line"
+      edge:
+          node0_id: 30
+          node1_id: 331
+    - task_type: "traffic_light"
+      edge:
+          node0_id: 31
+          node1_id: 32
+    - task_type: "detect_line"
+      edge:
+          node0_id: 32
+          node1_id: 33
+    # - task_type: "in_line"
+    #   edge:
+    #       node0_id: 33
+    #       node1_id: 34
+    - task_type: "traffic_light"
+      edge:
+          node0_id: 34
+          node1_id: 35
+    - task_type: "detect_line"
+      edge:
+          node0_id: 55
+          node1_id: 556
+    - task_type: "traffic_light"
+      edge:
+          node0_id: 56
+          node1_id: 57
+    - task_type: "in_line"
+      edge:
+          node0_id: 57
+          node1_id: 58
+    - task_type: "detect_line"
+      edge:
+          node0_id: 58
+          node1_id: 589
+    - task_type: "traffic_light"
+      edge:
+          node0_id: 59
+          node1_id: 60
+    - task_type: "slow"
+      edge:
+          node0_id: 602
+          node1_id: 601
+    # - task_type: "slow"
+    #   edge:
+    #       node0_id: 65
+    #       node1_id: 66

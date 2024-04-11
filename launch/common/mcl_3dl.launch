@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="without_odom" default="false"/>
+    <arg name="without_imu" default="false"/>
+    <arg name="use_neonavigation" default="true"/>
+    <arg name="use_pointcloud_map" default="true"/>
+    <arg name="use_cad_map" default="false" if="$(arg use_pointcloud_map)"/>
+    <arg name="use_cad_map" default="true" unless="$(arg use_pointcloud_map)"/>
+    <arg name="map_objs" unless="$(arg use_pointcloud_map)"/>
+    <!-- <arg name="map_pcd" if="$(arg use_pointcloud_map)"/> -->
+    <arg name="map_scale" default="1.0"/>
+    <arg name="map_offset_x" default="0.0"/>
+    <arg name="map_offset_y" default="0.0"/>
+    <arg name="initialpose_topic" default="initialpose"/>
+
+    <arg name="scan_cloud" default="velodyne_points"/>
+    <arg name="map_cloud" default="cloud_pcd"/>
+    <arg name="pose_topic_name" default="/amcl_pose"/>
+
+
+    <param name="/use_sim_time" value="false"/>
+
+    <arg name="config_file" default="$(find rwrc23)/config/param/mcl_3dl/ikuta/ikuta_localization.yaml" unless="$(eval arg('without_odom') or arg('without_imu'))"/>
+    <arg name="config_file" default="$(find rwrc23)/config/param/mcl_3dl/test/test_localization_noodom.yaml" if="$(arg without_odom)"/>
+    <!-- <arg name="config_file" default="$(find mcl_3dl)/config/test_localization_noimu.yaml"/> -->
+    <arg name="config_file" default="$(find rwrc23)/config/param/mcl_3dl/tsukuba/tsukuba_noimu_parrot.yaml" if="$(arg without_imu)"/>
+    <!-- <arg name="config_file" default="$(find mcl_3dl)/config/ikuta_localization_noimu.yaml" if="$(arg without_imu)"/> -->
+    <rosparam command="load" file="$(arg config_file)"/>
+
+    <!-- &#60;&#33;&#45;&#45; initial pose &#45;&#45;&#62; -->
+    <!-- <node pkg="rostopic" type="rostopic" name="init_pose" -->
+    <!--     args="pub -1 /initialpose geometry_msgs/PoseWithCovarianceStamped &#38;quot;{ -->
+    <!--     header: { -->
+    <!--     frame_id: &#38;quot;map&#38;quot; -->
+    <!--     }, -->
+    <!--     pose: { -->
+    <!--     pose: { -->
+    <!--     position: { -->
+    <!--     x: 0.0, -->
+    <!--     y: 0.0, -->
+    <!--     z: 0.0 -->
+    <!--     }, -->
+    <!--     orientation: { -->
+    <!--     x: 0.0, -->
+    <!--     y: 0.0, -->
+    <!--     z: -1.0, -->
+    <!--     w: 0.0 -->
+    <!--     } -->
+    <!--     } -->
+    <!--     } -->
+    <!--     }&#38;quot;" /> -->
+
+    <!--
+        Required topics
+        /imu/data (IMU data with estimated pose)
+        /cloud    (Measured pointcloud)
+        /odom     (Wheel odometry)
+    -->
+
+    <!-- velodyne_msg to pointcloud2 -->
+    <!-- <include file="$(find velodyne_pointcloud)/launch/VLP-32C_points.launch"/> -->
+
+    <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mcl_3dl)/config/mcl_3dl_demo.rviz" output="screen"/> -->
+    <!-- <node pkg="complement" type="complement" name="complement" > -->
+    <!--     <param name="topic_name/wheel" value="/whill/odom"/> -->
+    <!-- </node> -->
+    <node pkg="mcl_3dl" type="mcl_3dl" name="mcl_3dl" output="screen">
+        <param name="compatible" value="1" />
+        <remap from="/cloud" to="$(arg scan_cloud)" />
+        <remap from="/mapcloud" to="$(arg map_cloud)" />
+        <remap from="/amcl_pose" to="$(arg pose_topic_name)"/>
+        <remap from="/initialpose" to="$(arg initialpose_topic)"/>
+        <!-- <remap from="/odom" to="/whill/odom" if="$(arg without_imu)"/> -->
+        <!-- <remap from="/odom" to="/odom/complement" /> -->
+    </node>
+    <node pkg="obj_to_pointcloud" type="obj_to_pointcloud" name="obj_to_pointcloud" if="$(arg use_cad_map)">
+        <param name="objs" value="$(arg map_objs)" />
+        <param name="offset_x" value="$(arg map_offset_x)" />
+        <param name="offset_y" value="$(arg map_offset_y)" />
+        <param name="scale" value="$(arg map_scale)" />
+        <remap from="~/cloud" to="mapcloud" />
+    </node>
+    <!-- <node pkg="pcl_ros" type="pcd_to_pointcloud" name="pcd_to_pointcloud" args="$(arg map_pcd)" if="$(arg use_pointcloud_map)"> -->
+    <!--     <param name="interval" value="0" /> -->
+    <!--     <remap from="cloud_pcd" to="mapcloud" /> -->
+    <!-- </node> -->
+</launch>

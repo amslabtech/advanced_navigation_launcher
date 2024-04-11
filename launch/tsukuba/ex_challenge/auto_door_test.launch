@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="path" default="/home/amsl/catkin_ws/src/rwrc23"/>
+
+    <include file="$(arg path)/launch/common/default_full.launch">
+        <!-- MAP LOAD -->
+        <!-- <arg name="map_pcd" default="/home/amsl/pcd/iias_tsukuba.pcd"/> -->
+        <arg name="map_pcd" default="/home/amsl/pcd/iias_after_crcr.pcd"/>
+        <!-- <arg name="map_pcd" default="/share/PCD/tsukuba/iias_after_crcr.pcd"/> -->
+        <!-- <arg name="node_edge_map" default="$(arg path)/map/graph/iias_tsukuba_map.yaml"/> -->
+        <arg name="node_edge_map" default="$(arg path)/map/graph/revision_iias_tsukuba_map.yaml"/>
+
+
+        <!-- !!!!!!!!!! SELECT COURSE !!!!!!!!!! -->
+        <!-- autodoor100 to in -->
+        <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor100_to_in.yaml"/>
+        <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor100_to_in.yaml"/>
+        <arg name="start_node_id" default="102"/>
+        <arg name="goal_node_id" default="100"/>
+        <!-- autodoor100 to out -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor100_to_out.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor100_to_out.yaml"/> -->
+        <!-- <arg name="start_node_id" default="57"/> -->
+        <!-- <arg name="goal_node_id" default="11"/> -->
+
+        <!-- autodoor110 to in -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor110_to_in.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor110_to_in.yaml"/> -->
+        <!-- <arg name="start_node_id" default="14"/> -->
+        <!-- <arg name="goal_node_id" default="112"/> -->
+        <!-- autodoor110 to out -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor110_to_out.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor110_to_out.yaml"/> -->
+        <!-- <arg name="start_node_id" default="15"/> -->
+        <!-- <arg name="goal_node_id" default="110"/> -->
+
+        <!-- autodoor120 to in -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor120_to_in.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor120_to_in.yaml"/> -->
+        <!-- <arg name="start_node_id" default="7"/> -->
+        <!-- <arg name="goal_node_id" default="120"/> -->
+        <!-- autodoor120 to out -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor120_to_out.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor120_to_out.yaml"/> -->
+        <!-- <arg name="start_node_id" default="141"/> -->
+        <!-- <arg name="goal_node_id" default="6"/> -->
+
+        <!-- autodoor130 to in -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor130_to_in.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor130_to_in.yaml"/> -->
+        <!-- <arg name="start_node_id" default="142"/> -->
+        <!-- <arg name="goal_node_id" default="130"/> -->
+        <!-- autodoor130 to out -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor130_to_out.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor130_to_out.yaml"/> -->
+        <!-- <arg name="start_node_id" default="44"/> -->
+        <!-- <arg name="goal_node_id" default="132"/> -->
+
+        <!-- autodoor140 to in -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor140_to_in.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor140_to_in.yaml"/> -->
+        <!-- <arg name="start_node_id" default="6"/> -->
+        <!-- <arg name="goal_node_id" default="141"/> -->
+        <!-- autodoor140 to out -->
+        <!-- <arg name="checkpoint" default="$(arg path)/map/checkpoint/ex_challenge/auto_door/test_autodoor140_to_out.yaml"/> -->
+        <!-- <arg name="task_list" default="$(arg path)/map/task/ex_challenge/auto_door/test_autodoor140_to_out.yaml"/> -->
+        <!-- <arg name="start_node_id" default="130"/> -->
+        <!-- <arg name="goal_node_id" default="142"/> -->
+
+
+        <!-- !!!!!!!!!! LOCALIZER METHOD !!!!!!!!!! -->
+        <!-- "ndt" or "mcl_with_imu" or "mcl_no_imu" -->
+        <arg name="localizer_3d/localization_method" default="ndt"/>
+        <arg name="localizer_3d/use_static_clouds" default="true"/>
+
+        <!-- NO NEED TO CHANGE -->
+        <arg name="stop_list" default="$(arg path)/map/stop/no_stop.yaml"/>
+        <arg name="use_road_publisher" default="false"/>
+        <arg name="use_stop_line_detector" default="false"/>
+        <arg name="width_list" default=""/>
+
+        <!-- param -->
+        <arg name="local_map_expansion" default="0.05"/>
+    </include>
+
+
+    <!-- !!!!!!!!!! INIT POSE !!!!!!!!!! -->
+    <node pkg="rostopic" type="rostopic" name="init_pose"
+        args="pub -1 /initialpose geometry_msgs/PoseWithCovarianceStamped &quot;{
+        header: {
+        frame_id: &quot;map&quot;
+        },
+        pose: {
+        pose: {
+        position: {
+        x: 2.6,
+        y: -4.4,
+        z: 0.0
+        },
+        orientation: {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+        w: 1.0
+        }
+        }
+        }
+        }&quot;" />
+</launch>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- play bag -->
+    <arg name="bagfile" default="/share/share/RWRC/rwrc23/bagfiles/tsukuba_23-10-21/rwrc23_main_2023-10-21-14-48-31.bag"/>
+    <arg name="map_pcd" default="/share/share/RWRC/rwrc23/pcd/tsukuba.pcd"/>
+    <arg name="start" default="0"/>
+    <arg name="rate" default="1"/>
+
+    <arg name="rviz_conf" default="$(find rwrc23)/config/rviz/localizer.rviz"/>
+
+    <!-- localizer setting -->
+    <arg name="localizer_3d/scan_cloud_topic" default="/velodyne_points"/>
+    <arg name="localized_pose_topic" default="/localized_pose"/>
+
+    <!-- time setting -->
+    <param name="use_sim_time" value="true"/>
+
+    <!-- point cloud -->
+    <include file="$(find velodyne_pointcloud)/launch/VLP-32C_points.launch"/>
+    <node pkg="pcl_ros" type="pcd_to_pointcloud" name="pcd_to_pointcloud" args="$(arg map_pcd)" output="screen">
+        <param name="frame_id" value="map"/>
+        <param name="latch" value="true"/>
+        <remap from="/cloud_pcd" to="/map_cloud"/>
+    </node>
+
+    <!-- <param name="/ndt_odom_integrator/init_x" value="0"/> -->
+    <!-- <param name="/ndt_odom_integrator/init_y" value="0"/> -->
+    <!-- <param name="/ndt_odom_integrator/init_yaw" value="3.14"/> -->
+    <param name="/map_matcher/range" value="100"/>
+
+    <!-- ndt -->
+    <node pkg="amsl_navigation_utils" type="map_cloud_downsampler" name="map_cloud_downsampler" output="screen" respawn="true">
+        <param name="leaf_size" value="0.5"/>
+    </node>
+    <include file="$(find rwrc23)/launch/common/ndt.launch">
+        <arg name="scan_cloud" value="$(arg localizer_3d/scan_cloud_topic)"/>
+        <!-- <arg name="map_cloud" value="/map_cloud"/> -->
+        <arg name="map_cloud" value="map_cloud/downsampled"/>
+        <arg name="initialpose_topic" value="initialpose/adjusted"/>
+    </include>
+    <node pkg="amsl_navigation_utils" type="odom_to_pose" name="odom_to_pose">
+        <remap from="/odom" to="/estimated_pose"/>
+        <remap from="/pose" to="$(arg localized_pose_topic)"/>
+    </node>
+
+    <!-- tf -->
+    <!-- <param name="/ndt_odom_integrator/enable_odom_tf" value="true"/> -->
+        <!-- <param name="/ndt_odom_integrator/enable_tf" value="true"/> -->
+    <node pkg="amsl_navigation_utils" type="odom_broadcaster" name="odom_broadcaster"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="static_tf_velodyne" args="0 0 1.17 0 0 0 base_link velodyne"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="static_tf_imu" args="0 0 1.08 1.5707963 3.1415927 0 base_link imu_link"/>
+
+    <!-- rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_conf)"/>
+    <!--  -->
+    <!-- play bag -->
+    <node pkg="rosbag" type="play" name="play_bag" output="screen" args=" $(arg bagfile) --clock -s $(arg start) -r $(arg rate) --topics /velodyne_packets /whill/odom /imu/data /grasscam/image_raw/compressed /equirectangular/image_raw/compressed /odom"/>
+</launch>

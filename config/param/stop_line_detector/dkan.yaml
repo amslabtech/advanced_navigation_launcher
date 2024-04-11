@@ -1,0 +1,36 @@
+##### shape settings
+rectangularity_th: 0.60
+rect_angle_th: 30.0 #deg against x
+aspect_lo: 5.0 #width/hight
+aspect_hi: 10.0 #width/hight
+height_lo: 25
+height_hi: 40
+
+##### color settings
+whiteness_th: 0.60
+texture_th: 5
+smoothness_th: 0.40
+hsv_lo: [0,0,150]
+hsv_hi: [180,50,255]
+
+##### line settings
+line_length_th: 50 #cell(x)
+close_line_th: 5 #cell
+parallelism_th: 0.90
+
+##### candidate settings
+split_num: 10
+resize_num: 120
+
+##### transform
+###jikki
+trans_upper_left: [202,30]
+trans_upper_right: [455,29]
+###tsukubag
+# trans_upper_left: [271,50]
+# trans_upper_right: [452,47]
+
+##### stop distance before line
+#(100, 90, 80,  70,  60,  50,  40,  30)
+#( 30, 55, 83, 115, 155, 203, 265, 347)
+stop_level: 203 #cell(y)

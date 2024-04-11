@@ -1,0 +1,11 @@
+task:
+  -
+    task_type: "autodoor"
+    edge:
+      node0_id: 141
+      node1_id: 120
+  -
+    task_type: "autodoor"
+    edge:
+      node0_id: 120
+      node1_id: 6

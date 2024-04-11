@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="dir_path" default="/home/amsl/bagfiles/rwrc23"/>
+    <arg name="head_name" default="rwrc23"/>
+    <node pkg="rosbag" type="record" name="bagrec_main" args="record -o $(arg dir_path)/$(arg head_name)_main
+        /back_hokuyo/scan
+        /front_hokuyo/scan
+        /grasscam/image_raw/compressed
+        /realsense/color/image_raw/compressed
+        /imu/data
+        /local_goal
+        /local_goal_creator/path
+        /local_path/cmd_vel
+        /localized_pose
+        /odom
+        /tf
+        /tf_static
+        /velodyne_packets
+        /whill/controller/cmd_vel
+        "/>
+</launch>

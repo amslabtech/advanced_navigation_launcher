@@ -1,0 +1,11 @@
+stop_list:
+    - node_id: 21
+    - node_id: 24
+    - node_id: 25
+    - node_id: 31
+    - node_id: 34
+    - node_id: 56
+    - node_id: 59
+    - node_id: 62
+    - node_id: 63
+    - node_id: 601

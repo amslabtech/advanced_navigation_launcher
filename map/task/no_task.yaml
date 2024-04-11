@@ -1,0 +1,5 @@
+task:
+    - task_pyte: "detect_line"
+      edge:
+          node0_id: -1
+          node1_id: -2

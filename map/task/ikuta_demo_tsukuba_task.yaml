@@ -1,0 +1,57 @@
+task:
+  - task_type: "slow"
+    edge:
+      node0_id: 1
+      node1_id: 2
+  - task_type: "in_line"
+    edge:
+      node0_id: 2
+      node1_id: 15
+### first traffic ###
+  - task_type: "in_line"
+    edge:
+      node0_id: 100
+      node1_id: 21
+  - task_type: "detect_line"
+    edge:
+      node0_id: 21
+      node1_id: 22
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 23
+      node1_id: 24
+### second traffic ###
+  - task_type: "detect_line"
+    edge:
+      node0_id: 24
+      node1_id: 25
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 101
+      node1_id: 102
+### third traffic ###
+  - task_type: "detect_line"
+    edge:
+      node0_id: 25
+      node1_id: 24
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 200
+      node1_id: 23
+### forth traffic ###
+  - task_type: "in_line"
+    edge:
+      node0_id: 23
+      node1_id: 22
+  - task_type: "detect_line"
+    edge:
+      node0_id: 22
+      node1_id: 21
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 103
+      node1_id: 20
+  - task_type: "slow"
+    edge:
+      node0_id: 14
+      node1_id: 0

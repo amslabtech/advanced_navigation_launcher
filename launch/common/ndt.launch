@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="map_cloud" default="cloud_pcd"/>
+    <arg name="scan_cloud" default="velodyne_points"/>
+    <arg name="initialpose_topic" default="initialpose"/>
+    <arg name="leaf_size" default="0.3"/>
+    <arg name="scan_range" default="50"/>
+    <arg name="sigma_odom" default="0.01"/>
+    <arg name="sigma_imu" default="0.01"/>
+    <arg name="sigma_ndt" default="0.1"/>
+
+    <node pkg="ndt_localizer" type="map_matcher" name="map_matcher">
+        <remap from="scan_cloud" to="$(arg scan_cloud)"/>
+        <remap from="map_cloud" to="$(arg map_cloud)"/>
+        <param name="leaf_size" value="$(arg leaf_size)"/>
+        <param name="epsilon" value="1e-2"/>
+        <param name="max_iteration" value="30"/>
+        <param name="range" value="$(arg scan_range)"/>
+    </node>
+    <node pkg="ndt_localizer" type="ndt_odom_integrator" name="ndt_odom_integrator">
+        <remap from="odom" to="odom"/>
+        <remap from="imu/data" to="imu/data"/>
+        <remap from="map_cloud" to="$(arg map_cloud)"/>
+        <remap from="initialpose" to="$(arg initialpose_topic)"/>
+        <param name="sigma_odom" value="$(arg sigma_odom)"/>
+        <param name="sigma_imu" value="$(arg sigma_imu)"/>
+        <param name="sigma_ndt" value="$(arg sigma_ndt)"/>
+        <param name="enable_odom_tf" value="false"/>
+    </node>
+</launch>

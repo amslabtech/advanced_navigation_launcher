@@ -1,0 +1,10 @@
+stop_list:
+    - node_id: 19
+    - node_id: 22
+    - node_id: 24
+    - node_id: 20
+    - node_id: 19
+    - node_id: 22
+    - node_id: 24
+    - node_id: 20
+    - node_id: 0

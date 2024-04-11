@@ -1,0 +1,45 @@
+task:
+  - task_type: "slow"
+    edge:
+      node0_id: 2
+      node1_id: 15
+  - task_type: "in_line"
+    edge:
+      node0_id: 100
+      node1_id: 21
+  - task_type: "detect_line"
+    edge:
+      node0_id: 21
+      node1_id: 22
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 22
+      node1_id: 24
+  - task_type: "detect_line"
+    edge:
+      node0_id: 24
+      node1_id: 25
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 25
+      node1_id: 26
+  - task_type: "in_line"
+    edge:
+      node0_id: 101
+      node1_id: 25
+  - task_type: "detect_line"
+    edge:
+      node0_id: 25
+      node1_id: 24
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 24
+      node1_id: 22
+  - task_type: "detect_line"
+    edge:
+      node0_id: 22
+      node1_id: 21
+  - task_type: "traffic_light"
+    edge:
+      node0_id: 21
+      node1_id: 20

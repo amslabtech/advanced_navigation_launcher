@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="local_map_expansion" default="0.03"/>
+
+    <!-- scan2pcl -->
+    <node pkg="localmap_creator" type="scan2pcl" name="front_lidar_pc">
+        <remap from="/scan" to="/front_hokuyo/scan"/>
+        <remap from="/cloud" to="/front_hokuyo/cloud"/>
+    </node>
+    <node pkg="localmap_creator" type="scan2pcl" name="back_lidar_pc">
+        <remap from="/scan" to="/back_hokuyo/scan"/>
+        <remap from="/cloud" to="/back_hokuyo/cloud"/>
+    </node>
+    <node pkg="localmap_creator" type="scan2pcl" name="velodyne_pc">
+        <remap from="/cloud" to="/scan/cloud"/>
+    </node>
+
+    <!-- extract pc from velodyne -->
+    <node pkg="localmap_creator" type="pc_extractor" name="pc_extractor" output="screen">
+        <param name="max_height" value="0.65"/>
+        <param name="min_height" value="0.3"/>
+        <remap from="/cloud_in" to="/velodyne_points"/>
+        <remap from="/cloud_out" to="/extracted_velodyne_points"/>
+    </node>
+
+    <!-- merge pc -->
+    <node pkg="localmap_creator" type="pc_merger" name="pc_merger0" output="screen">
+        <param name="hz" value="20"/>
+        <param name="cloud_num" value="3"/>
+        <param name="cloud_count_th" value="1"/>
+        <remap from="/cloud0" to="/back_hokuyo/cloud"/>
+        <remap from="/cloud1" to="/scan/cloud"/>
+        <remap from="/cloud2" to="/extracted_velodyne_points"/>
+        <remap from="/cloud" to="/merged_points0"/>
+    </node>
+    <node pkg="localmap_creator" type="pc_merger" name="pc_merger" output="screen">
+        <param name="hz" value="20"/>
+        <param name="cloud_num" value="2"/>
+        <param name="cloud_count_th" value="2"/>
+        <remap from="/cloud0" to="/front_hokuyo/cloud"/>
+        <remap from="/cloud1" to="/merged_points0"/>
+        <remap from="/cloud" to="/merged_points"/>
+    </node>
+
+    <!-- Create localmap -->
+    <node pkg="localmap_creator" type="simple_localmap_creator" name="simple_localmap_creator">
+        <param name="width" value="18.0"/>
+        <param name="max_height" value="1.2"/>
+        <param name="min_height" value="0.0"/>
+        <param name="resolution" value="0.025"/>
+        <param name="leaf_size" value="0.05"/>
+        <param name="expand_radius" value="$(arg local_map_expansion)"/>
+        <remap from="/cloud" to="/merged_points"/>
+    </node>
+</launch>
