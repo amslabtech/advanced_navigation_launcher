@@ -6,8 +6,8 @@
     <arg name="hz" default="20"/>
     <arg name="subscribe_count_th" default="3"/>
     <arg name="sleep_time_after_finish" default="0.5"/>
-    <arg name="planner_param" default="$(find rwrc23)/config/param/pfp/planner_param.yaml"/>
-    <arg name="robot_param" default="$(find rwrc23)/config/param/pfp/robot_param.yaml"/>
+    <arg name="planner_param" default="$(find advanced_navigation_launcher)/config/param/pfp/planner_param.yaml"/>
+    <arg name="robot_param" default="$(find advanced_navigation_launcher)/config/param/pfp/robot_param.yaml"/>
     <!-- topic name -->
     <arg name="cmd_vel" default="/local_path/cmd_vel"/>
     <arg name="footprint" default="/footprint"/>

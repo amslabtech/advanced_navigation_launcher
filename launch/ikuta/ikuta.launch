@@ -1,19 +1,15 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="start" default="0" />
-    <include file="$(find rwrc23)/launch/common/default_full.launch">
+    <include file="$(find advanced_navigation_launcher)/launch/common/default_full.launch">
         <!-- course -->
-        <!-- <arg name="task_list" value="$(find rwrc23)/map/task/ikuta_new_course_task.yaml"/> -->
-        <!-- <arg name="task_list" value="$(find rwrc23)/map/task/ikuta_task.yaml"/> -->
-        <arg name="task_list" value="$(find rwrc23)/map/task/no_task.yaml"/>
+        <arg name="task_list" value="$(find advanced_navigation_launcher)/map/task/no_task.yaml"/>
 
         <!-- common -->
         <arg name="start_node_id" value="$(arg start)"/>
-        <!-- <arg name="stop_list" value="$(find rwrc23)/map/stop/ikuta_new_course_stop.yaml"/> -->
-        <!-- <arg name="stop_list" value="$(find rwrc23)/map/stop/ikuta_stop.yaml"/> -->
-        <arg name="stop_list" value="$(find rwrc23)/map/stop/no_stop.yaml"/>
+        <arg name="stop_list" value="$(find advanced_navigation_launcher)/map/stop/no_stop.yaml"/>
         <arg name="use_stop_line_detector" value="true"/>
-        <arg name="stop_line_param" default="$(find rwrc23)/config/param/stop_line_detector/ikuta_outdoor.yaml"/>
+        <arg name="stop_line_param" default="$(find advanced_navigation_launcher)/config/param/stop_line_detector/ikuta_outdoor.yaml"/>
         <arg name="local_goal_dist" value="4.0"/>
         <arg name="local_map_expansion" value="0.075"/>
         <arg name="planner_hz" value="20"/>
@@ -22,6 +18,6 @@
         <arg name="localizer_3d/use_static_clouds" value="false"/>
         <!-- map -->
         <arg name="map_pcd" value="/home/amsl/pcd/ikuta.pcd"/>
-        <arg name="node_edge_map" value="$(find rwrc23)/map/graph/ikuta_graph.yaml"/>
+        <arg name="node_edge_map" value="$(find advanced_navigation_launcher)/map/graph/ikuta_graph.yaml"/>
     </include>
 </launch>

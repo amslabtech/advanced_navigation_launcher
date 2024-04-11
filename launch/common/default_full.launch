@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="map_pcd" default="/home/amsl/pcd/"/>
-    <arg name="node_edge_map" default="$(find rwrc23)/map/graph"/>
-    <arg name="checkpoint" default="$(find rwrc23)/map/checkpoint"/>
+    <arg name="node_edge_map" default="$(find advanced_navigation_launcher)/map/graph"/>
     <arg name="start_node_id" default="0"/>
-    <arg name="task_list" default="$(find rwrc23)/map/task"/>
-    <arg name="stop_list" default="$(find rwrc23)/map/stop"/>
+    <arg name="task_list" default="$(find advanced_navigation_launcher)/map/task"/>
+    <arg name="stop_list" default="$(find advanced_navigation_launcher)/map/stop"/>
     <arg name="local_goal_dist" default="4.0"/>
     <arg name="local_map_expansion" default="0.2"/> <!-- m -->
     <arg name="local_map_topic" default="/local_map/expand"/>
@@ -22,13 +21,13 @@
     <!-- Planner -->
     <arg name="planner_hz" default="20"/>
     <arg name="sleep_time_after_finish" default="0.5"/>
-    <arg name="dwa_robot_param" default="$(find rwrc23)/config/param/dwa/robot_param.yaml"/>
-    <arg name="dwa_param" default="$(find rwrc23)/config/param/dwa/dwa_param.yaml"/>
-    <arg name="pfp_robot_param" default="$(find rwrc23)/config/param/pfp/robot_param.yaml"/>
-    <arg name="pfp_param" default="$(find rwrc23)/config/param/pfp/planner_param.yaml"/>
+    <arg name="dwa_robot_param" default="$(find advanced_navigation_launcher)/config/param/dwa/robot_param.yaml"/>
+    <arg name="dwa_param" default="$(find advanced_navigation_launcher)/config/param/dwa/dwa_param.yaml"/>
+    <arg name="pfp_robot_param" default="$(find advanced_navigation_launcher)/config/param/pfp/robot_param.yaml"/>
+    <arg name="pfp_param" default="$(find advanced_navigation_launcher)/config/param/pfp/planner_param.yaml"/>
     <!-- stop_line_detector -->
     <arg name="use_stop_line_detector" default="true"/>
-    <arg name="stop_line_param" default="$(find rwrc23)/config/param/stop_line_detector/stop_line_detector.yaml"/>
+    <arg name="stop_line_param" default="$(find advanced_navigation_launcher)/config/param/stop_line_detector/stop_line_detector.yaml"/>
     <!-- map downsampling -->
     <arg name="use_downsampled_map" default="true"/>
     <arg name="leaf_size" default="0.32"/>
@@ -59,7 +58,7 @@
     <arg name="pfp_finish_flag" default="/local_planner/point_follow_planner/finish_flag"/>
     <arg name="select_topic" default="/local_planner/finish_flag/selected"/>
     <!-- rviz -->
-    <arg name="rviz_conf" default="$(find rwrc23)/config/rviz/rviz.rviz"/>
+    <arg name="rviz_conf" default="$(find advanced_navigation_launcher)/config/rviz/rviz.rviz"/>
 
 
     <!-- ########## Map load ########## -->
@@ -98,7 +97,7 @@
     </group>
     <!-- mcl_with_imu -->
     <group if="$(eval arg('localizer_3d/localization_method')=='mcl_with_imu')">
-        <include file="$(find rwrc23)/launch/common/mcl_3dl.launch">
+        <include file="$(find advanced_navigation_launcher)/launch/common/mcl_3dl.launch">
             <arg name="without_imu" value="false"/>
             <arg name="pose_topic_name" value="$(arg localized_pose_topic)"/>
             <arg name="scan_cloud" value="$(arg localizer_3d/scan_cloud_topic)"/>
@@ -109,7 +108,7 @@
     </group>
     <!-- mcl_no_imu -->
     <group if="$(eval arg('localizer_3d/localization_method')=='mcl_no_imu')">
-        <include file="$(find rwrc23)/launch/common/mcl_3dl.launch">
+        <include file="$(find advanced_navigation_launcher)/launch/common/mcl_3dl.launch">
             <arg name="without_imu" value="true"/>
             <arg name="pose_topic_name" value="$(arg localized_pose_topic)"/>
             <arg name="scan_cloud" value="$(arg localizer_3d/scan_cloud_topic)"/>
@@ -120,7 +119,7 @@
     </group>
     <!-- ndt -->
     <group if="$(eval arg('localizer_3d/localization_method')=='ndt')">
-        <include file="$(find rwrc23)/launch/common/ndt.launch">
+        <include file="$(find advanced_navigation_launcher)/launch/common/ndt.launch">
             <arg name="scan_cloud" value="$(arg localizer_3d/scan_cloud_topic)"/>
             <arg name="map_cloud" value="/map_cloud/downsampled" if="$(arg use_downsampled_map)"/>
             <arg name="map_cloud" value="/map_cloud" unless="$(arg use_downsampled_map)"/>
@@ -142,10 +141,10 @@
     <!-- footprint publisher -->
     <node pkg="amsl_navigation_utils" type="footprint_publisher" name="footprint_publisher">
         <param name="hz" value="1"/>
-        <rosparam command="load" file="$(find rwrc23)/config/param/footprint/robot_param.yaml"/>
+        <rosparam command="load" file="$(find advanced_navigation_launcher)/config/param/footprint/robot_param.yaml"/>
     </node>
     <!-- dwa -->
-    <include file="$(find rwrc23)/launch/common/dwa.launch">
+    <include file="$(find advanced_navigation_launcher)/launch/common/dwa.launch">
         <arg name="hz" value="$(arg planner_hz)"/>
         <arg name="cmd_vel" value="$(arg dwa_cmd_vel)"/>
         <arg name="sleep_time_after_finish" value="$(arg sleep_time_after_finish)"/>
@@ -157,7 +156,7 @@
         <remap from="candidate_trajectories" to="$(arg dwa_cand_traj)"/>
     </include>
     <!-- point follow planner -->
-    <include file="$(find rwrc23)/launch/common/pfp.launch">
+    <include file="$(find advanced_navigation_launcher)/launch/common/pfp.launch">
         <arg name="hz" value="$(arg planner_hz)"/>
         <arg name="cmd_vel" value="$(arg pfp_cmd_vel)"/>
         <arg name="sleep_time_after_finish" value="$(arg sleep_time_after_finish)"/>
@@ -184,7 +183,7 @@
     </include>
 
     <!-- localmap creator -->
-    <include file="$(find rwrc23)/launch/common/localmap_creator.launch">
+    <include file="$(find advanced_navigation_launcher)/launch/common/localmap_creator.launch">
         <arg name="local_map_expansion" value="$(arg local_map_expansion)"/>
     </include>
 
@@ -202,10 +201,9 @@
     <include file="$(find traffic_light_detector)/launch/docker_run.launch"/>
 
     <!-- amsl_navigation_managers -->
-    <include file="$(find rwrc23)/launch/common/amsl_navigation_managers.launch">
+    <include file="$(find advanced_navigation_launcher)/launch/common/amsl_navigation_managers.launch">
         <arg name="start_node_id" value="$(arg start_node_id)"/>
         <arg name="map_file" value="$(arg node_edge_map)"/>
-        <arg name="checkpoint_file" value="$(arg checkpoint)"/>
         <arg name="task_list_path" value="$(arg task_list)"/>
         <arg name="stop_list_path" value="$(arg stop_list)"/>
         <arg name="localized_pose_topic" value="$(arg localized_pose_topic)"/>

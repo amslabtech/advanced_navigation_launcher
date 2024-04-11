@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="start_node_id" default="0"/>
-    <arg name="task_list_path" default="/home/amsl/catkin_ws/src/rwrc23/map/task/ikuta_test_task.yaml"/>
-    <arg name="stop_list_path" default="/home/amsl/catkin_ws/src/rwrc23/map/stop/ikuta_test_stop.yaml" />
+    <arg name="task_list_path" default="/home/amsl/catkin_ws/src/advanced_navigation_launcher/map/task/ikuta_test_task.yaml"/>
+    <arg name="stop_list_path" default="/home/amsl/catkin_ws/src/advanced_navigation_launcher/map/stop/ikuta_test_stop.yaml" />
 
     <!-- common -->
     <arg name="localized_pose_topic" default="/localized_pose"/>
@@ -75,7 +75,8 @@
         <param name="MAP_PATH" value="$(arg map_file)" />
         <param name="HZ" value="10" />
     </node>
-    <node pkg="amsl_navigation_managers" type="checkpoint_manager.py" name="checkpoint_manager" ns="navigation_managers">
+    <node pkg="amsl_navigation_managers" type="checkpoint_manager.py" name="checkpoint_manager" ns="navigation_managers" output="screen">
+        <param name="MAP_PATH" value="$(arg map_file)" />
         <param name="HZ" value="10" />
     </node>
 </launch>
